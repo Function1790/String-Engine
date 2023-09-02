@@ -1,0 +1,15 @@
+body {
+    background-color: #e2e2e2;
+}
+
+canvas {
+    position: fixed;
+    background-color: white;
+    border: 3px solid #464646;
+}
+
+#canvas2 {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0);
+    border: 3px solid #464646;
+}
