@@ -11,22 +11,27 @@ const data = {
     GravityConstant: 0.1,   //1
     ElasticModulus: 0.5,    //20
     objectMass: 1,
-    NodeSize: 0,
+    NodeSize: 1,
     NodeCount: 10
 }
 
 const delta = {
-    x: 20,
+    x: 20, //20
     y: 20
 }
+
+
+const FocusIndex = 4
+const O = { x: canvas.width / 2, y: canvas.height / 2 }
 
 const v_limit = 5
 
 const PI2 = Math.PI * 2
 const print = (t) => { console.log(t) }
 
-function lineTo(x1, y1, x2, y2) {
+function lineTo(x1, y1, x2, y2, color = "black") {
     ctx.beginPath()
+    ctx.strokeStyle = color
     ctx.moveTo(x1, y1)
     ctx.lineTo(x2, y2)
     ctx.stroke()
@@ -67,6 +72,7 @@ class Ball {
     get y() { return this.pos.y }
     draw() {
         lineTo(this.x, this.y, this.hangPos.x, this.hangPos.y)
+        //lineTo(this.x, this.y, this.x + this.vel.x * 50, this.y + this.vel.y * 50, "red")
         drawCircle(this.x, this.y, this.radius)
     }
     applyGravity() {
@@ -130,18 +136,38 @@ for (var i = 0; i < data.NodeCount; i++) {
 }
 renderObj.push(new Ball(renderObj[renderObj.length - 1].x + delta.x, renderObj[renderObj.length - 1].y + delta.y, 2, 10, renderObj[renderObj.length - 1], renderObj[renderObj.length - 1].pos))
 
+const recordData = []
+function showRecords() {
+    console.log("[")
+    for (var i in recordData) {
+        console.log(`(${recordData[i][0]}, ${recordData[i][1]}),`)
+    }
+    console.log("]")
+}
+Ek = (m, v) => { return 0.5 * m * (v.x ** 2 + v.y ** 2) }
+Ep = (m, y) => { return data.GravityConstant * m * (800 - y) }
+tick = 0
+
 ctx2.fillStyle = 'rgba(255,60,25,0.5)'
 function render() {
 
     ctx.clearRect(0, 0, data.width, data.height)
 
     drawCircle(data.Origin.x, data.Origin.y, 2)
+    E0 = 0
+    E1 = 0
     for (var i in renderObj) {
         renderObj[i].move()
         renderObj[i].draw()
+        E0 += Ek(renderObj[i].mass, renderObj[i].vel)
+        E1 += Ep(renderObj[i].mass, renderObj[i].pos.y)
     }
-    console.log(renderObj[3].vel)
+    recordData.push([E0, E1])
 
+    if (tick == 600) {
+        showRecords()
+    }
+    tick += 1
     requestAnimationFrame(render)
 }
 
